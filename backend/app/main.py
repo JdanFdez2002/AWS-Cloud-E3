@@ -1,20 +1,53 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
-import boto3
+from app.models import UploadRequest
+from app.config.s3_client import s3_client
 import os
 
 load_dotenv()
 
 app = FastAPI()
 
-s3 = boto3.client(
-    "s3",
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
-    region_name=os.getenv("AWS_REGION")
-)
 
 @app.get("/healthz")
 def health():
     return {"status": "ok"}
+
+
+@app.post("/api/upload/presigned-url")
+def generate_presigned_url(data: UploadRequest):
+
+    allowed_types = [
+        "application/pdf",
+        "text/csv"
+    ]
+
+    if data.fileType not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Tipo de archivo no permitido"
+        )
+
+    key = f"uploads/{data.fileName}"
+
+    try:
+        presigned_url = s3_client.generate_presigned_url(
+            "put_object",
+            Params={
+                "Bucket": os.getenv("S3_BUCKET_NAME"),
+                "Key": key,
+                "ContentType": data.fileType
+            },
+            ExpiresIn=300
+        )
+
+        return {
+            "presignedUrl": presigned_url,
+            "key": key
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
