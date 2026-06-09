@@ -1,9 +1,11 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState, useEffect } from "react";
 
 function App() {
 
   const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
+
 
   const uploadFile = async () => {
 
@@ -37,6 +39,7 @@ function App() {
       );
 
       alert("Archivo subido correctamente");
+      loadFiles();
 
     } catch (error) {
 
@@ -45,6 +48,26 @@ function App() {
       alert("Error al generar URL");
     }
   };
+
+  const loadFiles = async () => {
+
+    try {
+  
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/files"
+      );
+  
+      setFiles(response.data);
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  useEffect(() => {
+    loadFiles();
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -58,6 +81,15 @@ function App() {
       <button onClick={uploadFile}>
         Subir Archivo
       </button>
+      <h2>Archivos</h2>
+      <ul>
+        {files.map((item) => (
+          <li key={item.key}>
+            {item.key}
+          </li>
+        ))}
+      </ul>
+
     </div>
   );
 }
