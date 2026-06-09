@@ -1,3 +1,8 @@
-import boto3
+from fastapi import FastAPI
+from dotenv import load_dotenv
 
-s3_client = boto3.client("s3")  
+from app.config.s3_client import s3_client
+
+load_dotenv()
+
+app = FastAPI()
