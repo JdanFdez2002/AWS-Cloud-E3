@@ -8,12 +8,12 @@ load_dotenv()
 
 app = FastAPI()
 
-
+# Endpoint: Healthz
 @app.get("/healthz")
 def health():
     return {"status": "ok"}
 
-
+# Endpoint: Presigned URL
 @app.post("/api/upload/presigned-url")
 def generate_presigned_url(data: UploadRequest):
 
@@ -52,6 +52,60 @@ def generate_presigned_url(data: UploadRequest):
         return {
             "presignedUrl": presigned_url,
             "key": key
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+    
+
+# Endpoint Get files: 
+@app.get("/api/files")
+def list_files():
+
+    try:
+        response = s3_client.list_objects_v2(
+            Bucket=os.getenv("S3_BUCKET_NAME"),
+            Prefix="uploads/"
+        )
+
+        files = []
+
+        for obj in response.get("Contents", []):
+            
+            if obj["Key"] == "uploads/":  #para que no cuente la carpeta uploads xD
+                continue
+
+            files.append({
+                "key": obj["Key"],
+                "size": obj["Size"],
+                "lastModified": obj["LastModified"]
+            })
+
+        return files
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+    
+
+#Endpoint DELETE:
+@app.delete("/api/files/{key:path}")
+def delete_file(key: str):
+
+    try:
+
+        s3_client.delete_object(
+            Bucket=os.getenv("S3_BUCKET_NAME"),
+            Key=key
+        )
+
+        return {
+            "message": "Archivo eliminado"
         }
 
     except Exception as e:
