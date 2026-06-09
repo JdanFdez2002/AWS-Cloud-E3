@@ -28,6 +28,14 @@ def generate_presigned_url(data: UploadRequest):
             detail="Tipo de archivo no permitido"
         )
 
+    MAX_SIZE = 22 * 1024 * 1024
+
+    if data.fileSize > MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail="El archivo supera el límite de 22 MB"
+        )
+
     key = f"uploads/{data.fileName}"
 
     try:
