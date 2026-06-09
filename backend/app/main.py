@@ -14,3 +14,7 @@ s3 = boto3.client(
     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
     region_name=os.getenv("AWS_REGION")
 )
+
+@app.get("/healthz")
+def health():
+    return {"status": "ok"}
