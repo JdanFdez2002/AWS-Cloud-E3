@@ -5,7 +5,7 @@ function App() {
 
   const [file, setFile] = useState(null);
   const [files, setFiles] = useState([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
 
   const uploadFile = async () => {
 
@@ -57,8 +57,9 @@ function App() {
         "http://127.0.0.1:8000/api/files"
       );
   
-      console.log("FILES:", response.data);
       setFiles(response.data);
+  
+      setCurrentPage(1);
   
     } catch (error) {
       console.error(error);
@@ -88,6 +89,19 @@ function App() {
   useEffect(() => {
     loadFiles();
   }, []);
+  const filesPerPage = 10;
+
+  const indexOfLastFile = currentPage * filesPerPage;
+  const indexOfFirstFile = indexOfLastFile - filesPerPage;
+
+  const currentFiles = files.slice(
+    indexOfFirstFile,
+    indexOfLastFile
+  );
+
+  const totalPages = Math.ceil(
+    files.length / filesPerPage
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -103,7 +117,7 @@ function App() {
       </button>
       <h2>Archivos</h2>
       <ul>
-        {files.map((item) => (
+        {currentFiles.map((item) => (
           <li key={item.key}>
             {item.key}
 
@@ -117,7 +131,30 @@ function App() {
           </li>
         ))}
       </ul>
+      <div style={{ marginTop: "20px" }}>
 
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+
+        <span style={{ margin: "0 10px" }}>
+          Página {currentPage} de {totalPages || 1}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={
+            currentPage === totalPages ||
+            totalPages === 0
+          }
+        >
+          Siguiente
+        </button>
+
+      </div>
     </div>
   );
 }
