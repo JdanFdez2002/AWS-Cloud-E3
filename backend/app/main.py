@@ -2,11 +2,22 @@ from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 from app.models import UploadRequest
 from app.config.s3_client import s3_client
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 load_dotenv()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Endpoint: Healthz
 @app.get("/healthz")
