@@ -57,6 +57,7 @@ function App() {
         "http://127.0.0.1:8000/api/files"
       );
   
+      console.log("FILES:", response.data);
       setFiles(response.data);
   
     } catch (error) {
@@ -64,6 +65,25 @@ function App() {
     }
   };
 
+  const deleteFile = async (key) => {
+
+    try {
+  
+      await axios.delete(
+        `http://127.0.0.1:8000/api/files/${key}`
+      );
+  
+      alert("Archivo eliminado");
+  
+      loadFiles();
+  
+    } catch (error) {
+  
+      console.error(error);
+  
+      alert("Error al eliminar archivo");
+    }
+  };
 
   useEffect(() => {
     loadFiles();
@@ -86,6 +106,14 @@ function App() {
         {files.map((item) => (
           <li key={item.key}>
             {item.key}
+
+            <button
+              onClick={() => deleteFile(item.key)}
+              style={{ marginLeft: "10px" }}
+            >
+              Eliminar
+            </button>
+
           </li>
         ))}
       </ul>
