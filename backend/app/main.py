@@ -30,7 +30,9 @@ def generate_presigned_url(data: UploadRequest):
 
     allowed_types = [
         "application/pdf",
-        "text/csv"
+        "text/csv",
+        "application/vnd.ms-excel"
+        
     ]
 
     if data.fileType not in allowed_types:
