@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
 
@@ -104,57 +105,97 @@ function App() {
   );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>ArchivaCloud P-10</h1>
+    <div className="container">
+      <h1 className="title">
+        ArchivaCloud P-10
+      </h1>
+      <p className="subtitle">
+        Gestión de archivos compatibilidad para : PDF y CSV
+      </p>
 
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files[0])}
-      />
+      <div className="upload-section">
+        <label className="file-label">
+          Seleccionar archivo
 
-      <button onClick={uploadFile}>
-        Subir Archivo
-      </button>
-      <h2>Archivos</h2>
-      <ul>
-        {currentFiles.map((item) => (
-          <li key={item.key}>
-            {item.key}
+          <input
+            type="file"
+            className="file-input"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </label>
 
-            <button
-              onClick={() => deleteFile(item.key)}
-              style={{ marginLeft: "10px" }}
-            >
-              Eliminar
-            </button>
+        <span className="file-name">
+          {file ? file.name : "Ningún archivo seleccionado"}
+        </span>
 
-          </li>
-        ))}
-      </ul>
-      <div style={{ marginTop: "20px" }}>
+        <button
+          className="button upload-btn"
+          onClick={uploadFile}
+        >
+          Subir archivo
+        </button>
 
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Archivo</th>
+            <th>Tamaño</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {currentFiles.map((item) => (
+
+            <tr key={item.key}>
+
+              <td>
+                {item.key.replace("uploads/", "")}
+              </td>
+
+              <td>
+                {(item.size / 1024).toFixed(1)} KB
+              </td>
+
+              <td>
+
+                <button
+                  className="button delete-btn"
+                  onClick={() => deleteFile(item.key)}
+                >
+                  Eliminar
+                </button>
+
+              </td>
+
+            </tr>
+
+          ))}
+
+        </tbody>
+      </table>
+
+      <div className="pagination">
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          Anterior
+          ←
         </button>
 
-        <span style={{ margin: "0 10px" }}>
+        <span>
           Página {currentPage} de {totalPages || 1}
         </span>
 
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={
-            currentPage === totalPages ||
-            totalPages === 0
-          }
+          disabled={currentPage === totalPages || totalPages === 0}
         >
-          Siguiente
+          →
         </button>
-
-      </div>
+        </div>
     </div>
   );
 }
