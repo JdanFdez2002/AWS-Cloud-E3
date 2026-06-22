@@ -15,6 +15,25 @@ function App() {
       return;
     }
 
+    const allowedTypes = [
+      "application/pdf",
+      "text/csv",
+      "application/vnd.ms-excel"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Solo se permiten archivos PDF y CSV");
+      return;
+    }
+
+    const MAX_SIZE = 22 * 1024 * 1024;
+
+    if (file.size > MAX_SIZE) {
+      alert("El archivo supera los 22 MB");
+      return;
+    }
+
+    aaaa
     try {
 
       const response = await axios.post(
@@ -119,6 +138,7 @@ function App() {
 
           <input
             type="file"
+            accept=".pdf,.csv"
             className="file-input"
             onChange={(e) => setFile(e.target.files[0])}
           />
