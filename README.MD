@@ -1,6 +1,6 @@
 # ArchivaCloud - Proyecto de Gestión Documental
 
-**Código de Pareja:** P-10 [1]
+**Código de Pareja:** P-10
 
 **Integrante:** Jordán Stevens Fernandez Mora
 
@@ -18,7 +18,7 @@ La aplicación utiliza URLs prefirmadas, permitiendo que el navegador suba los a
 *   **Frontend:** React 18, Vite, Axios/Fetch
 *   **Almacenamiento:** Amazon S3
 
-## Variables de Entorno [2]
+## Variables de Entorno
 | Variable | Descripción | Ejemplo |
 |---|---|---|
 | `AWS_ACCESS_KEY_ID` | Clave de acceso del usuario IAM | `AKIAIOSFODNN7EXAMPLE` |
@@ -26,7 +26,7 @@ La aplicación utiliza URLs prefirmadas, permitiendo que el navegador suba los a
 | `AWS_SESSION_TOKEN` | Token de sesión temporal (si aplica) | `IQoJb3JpZ2luX2...` |
 | `AWS_REGION` | Región del bucket S3 | `us-east-1` |
 
-## Política IAM Mínima (SEC-05) [2, 6]
+## Política IAM Mínima (SEC-05)
 ```json
 {
     "Version": "2012-10-17",
