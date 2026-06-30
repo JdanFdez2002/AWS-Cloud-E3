@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException # HTTPException para manejar errores 
 from dotenv import load_dotenv # carga variables de entorno archivo .env SEC-01
 from app.models import UploadRequest # carga el modelo de models.py 
 from app.config.s3_client import s3_client # carga las credenciales para el S3
+from app.config.dynamodb import table
+from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware # Conecta el puerto 5173 y FastAPI SEC-02
 import os
 
@@ -17,7 +19,6 @@ app.add_middleware(
     allow_methods=["*"], # Todo HTTP, Get,Post,Delete, etc
     allow_headers=["*"], # cualquier encabezado HTTP
 )
-
 
 # E.P:Se usa para ver que todo esté bien (Requisito)
 @app.get("/healthz")
@@ -65,6 +66,15 @@ def generate_presigned_url(data: UploadRequest):
             },
             ExpiresIn=300 # Tiempo de expiración de la URL (300 segundos = 5 minutos)
         )
+        table.put_item(
+            Item={
+                "key": key,
+                "fileName": data.fileName,
+                "fileType": data.fileType,
+                "fileSize": data.fileSize,
+                "createdAt": datetime.utcnow().isoformat()
+            }
+        )
 
         # Devuelve la URL generada y la ubicación del archivo en S3
         return {
@@ -75,6 +85,7 @@ def generate_presigned_url(data: UploadRequest):
 
     # Captura cualquier error inesperado durante la conexión o generación de URL
     except Exception as e:
+        print("ERROR: ",repr(e))
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -105,6 +116,7 @@ def list_files():
 
     # Manejo de errores relacionados con S3 u otros problemas internos
     except Exception as e:
+        print("ERROR: ",repr(e))
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -119,12 +131,18 @@ def delete_file(key: str):
             Bucket=os.getenv("S3_BUCKET_NAME"),
             Key=key
         )
+        table.delete_item(
+            Key={
+                "key": key
+            }
+        )
         # Respuesta confirmando la eliminación correcta
         return {
             "message": "Archivo eliminado"
         }
     # Manejo de errores durante la eliminación del archivo
     except Exception as e:
+        print("ERROR: ",repr(e))
         raise HTTPException(
             status_code=500, # "Internal Server Error"
             detail=str(e)
